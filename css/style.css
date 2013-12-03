@@ -1,0 +1,21 @@
+.slick {
+  width: 500px;
+  border: 1px solid #ccc; }
+  .slick .slick-content {
+    width: inherit;
+    height: 375px; }
+    .slick .slick-content img {
+      width: inherit; }
+  .slick .slick-bottom {
+    border-top: 1px solid #ccc;
+    height: 25px;
+    padding-top: 5px; }
+    .slick .slick-bottom .slick-controls img {
+      width: 20px;
+      margin-left: 5px; }
+    .slick .slick-bottom .slick-no {
+      float: right;
+      padding-right: 10px; }
+  .slick .loader {
+    width: 0px;
+    display: none; }
