@@ -6,7 +6,6 @@
 
 <div class="slick">
 	<div class="slick-content">
-		<img src="/slide/out-0.jpg" class="current">
 	</div>
 	<div class="slick-bottom">
 		<div class="slick-no">
@@ -17,7 +16,14 @@
 			<a href="#" class="next"><img src="/img/forward.png" alt=""></a>
 		</div>
 	</div>
-	<div class="loader">
-		
-	</div>
 </div>
+
+<script>
+	slick.config = {
+		source: '/slide/out-*.jpg',
+		serial_source: true,
+		start: 0,
+		end: 36
+	}
+	slick.init();
+</script>
