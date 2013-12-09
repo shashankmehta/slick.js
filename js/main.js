@@ -30,7 +30,7 @@
             }
         };
         
-        // this.init();
+        this.init.apply(this);
     };
 
     var SlickProto = Slick.prototype;
