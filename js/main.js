@@ -1,26 +1,23 @@
 (function ($, root) {
 
-    var defaults = {
-        next: '.next',
-        prev: '.prev',
-        serialSource: false,
-        contentClass: '.slick-content',
-        keyControl: true
-    };
-
     Slick = function (container, config) {
-        this.options = {};
+        this.options = {
+            source: undefined,
+            serialSource: false,
+            start: undefined,
+            end: undefined,
+            next: '.next',
+            prev: '.prev',
+            contentClass: '.slick-content',
+            keyControl: true,
+            container: container
+        };
 
-        this.options.container = container;
-
-        for (option in config) {
-            this.options[option] = config[option];
+        for (option in this.options) {
+            if (this.options.hasOwnProperty(option)) {
+                this.options[option] = config[option] !== undefined ? config[option] : this.options[option];
+            }
         }
-        
-        for(option in defaults){
-            this.options[option] = this.options[option] == undefined ? defaults[option] : this.options[option];
-        }
-
 
         this.state = {
             current: this.options.start-1,
