@@ -12,18 +12,21 @@
 			<span class="current-no"></span>/<span class="total"></span>
 		</div>
 		<div class="slick-controls">
-			<a href="#" class="back"><img src="/img/backward.png" alt=""></a>
+			<a href="#" class="prev"><img src="/img/backward.png" alt=""></a>
 			<a href="#" class="next"><img src="/img/forward.png" alt=""></a>
 		</div>
 	</div>
 </div>
-
 <script>
-	slick.config = {
+	config = {
 		source: '/slide/out-*.jpg',
-		serial_source: true,
+		serialSource: true,
 		start: 0,
-		end: 36
-	}
+		end: 36,
+		keyControl: false
+	};
+
+	var slick = new Slick('.slick', config);
 	slick.init();
+
 </script>

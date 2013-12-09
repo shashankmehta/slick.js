@@ -1,77 +1,113 @@
-(function($, root, undefined){
+(function($, root){
 
-	slick = {};
-
-	slick.state = {
-		current: 0,
-		start: 0,
-		end: 0,
-
-		slide: {
-			current:0,
-			total: 0,
-		}
+	var defaults = {
+		next: '.next',
+		prev: '.prev',
+		serialSource: false,
+		contentClass: '.slick-content',
+		keyControl: true
 	};
 
-	slick.hooks = {
+	Slick = function(container, config){
+		this.options = {};
+
+		this.options.container = container;
+
+		for(option in config){
+			this.options[option] = config[option];
+		}
+		
+		for(option in defaults){
+			this.options[option] = this.options[option] == undefined ? defaults[option] : this.options[option];
+		}
+
+
+		this.state = {
+			current: this.options.start-1,
+			start: this.options.start,
+			end: this.options.end,
+
+			slide: {
+				current:0,
+				total: this.options.end,
+			}
+		};
+		
+		// this.init();
+	};
+
+	var SlickProto = Slick.prototype;
+
+	SlickProto.hooks = {
 		next: function(){
-			if(slick.state.current < slick.state.end){
-				if(slick.config.serial_source === true){
-					var step = ++slick.state.current;
+			if(this.state.slide.current <= this.state.slide.total){
+				var container = this.options.container;
+				if(this.options.serialSource === true){
+					var step = ++this.state.current;
 				}
-				$('.slick-content').append('<img src="'+ slick.hooks.imagePath(step) +'" class="loader">');
-				$('.slick-content img.loader').load(function(){
-					$('.slick-content img.current').remove();
-					$('.slick-content img.loader').addClass('current').removeClass('loader');
+				$(container + ' ' + this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader">');
+				
+				var that = this;
+				$(container + ' '+this.options.contentClass+' img.loader').load(function(){
+					$(container + ' '+that.options.contentClass+' img.current').remove();
+					$(container + ' '+that.options.contentClass+' img.loader').addClass('current').removeClass('loader');
 				})
-				$('.slick .current-no').html(++slick.state.slide.current);
+				$(container + ' .current-no').html(++this.state.slide.current);
 			}
 		},
 
-		back: function(){
-			if(slick.state.current > slick.state.start){
-				if(slick.config.serial_source === true){
-					var step = --slick.state.current;
+		prev: function(container){
+			if(this.state.current > 0){
+				var container = this.options.container;
+				if(this.options.serialSource === true){
+					var step = --this.state.current;
 				}
-				$('.slick-content').append('<img src="'+ slick.hooks.imagePath(step) +'" class="loader">');
-				$('.slick-content img.loader').load(function(){
-					$('.slick-content img.current').remove();
-					$('.slick-content img.loader').addClass('current').removeClass('loader');
+				$(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader">');
+
+				var that  = this;
+				$(container + ' '+this.options.contentClass+' img.loader').load(function(){
+					$(container + ' '+that.options.contentClass+' img.current').remove();
+					$(container + ' '+that.options.contentClass+' img.loader').addClass('current').removeClass('loader');
 				})
-				$('.slick .current-no').html(--slick.state.slide.current);
+				$(container + ' .current-no').html(--this.state.slide.current);
 			}
 		},
 
 		imagePath: function(step){
-			var parts = slick.config.source.split('*');
+			var parts = this.options.source.split('*');
 			return parts[0] + step + parts[1];
 		}
 	};
 
-	slick.init = function(){
-		if(slick.config.serial_source === true){
-			if(typeof slick.config.source === "string"){
-				slick.state.current = slick.config.start - 1;
-				slick.state.end = slick.config.end;
-				slick.hooks.next();
+	SlickProto.init = function(){
+		var that = this;
+
+		if(this.options.serialSource === true){
+			if(typeof this.options.source === "string"){
+				this.hooks.next.apply(this);
 			}
 		}
-		$('.slick-controls .next').click(function(){
-			slick.hooks.next();
+		$(this.options.container + ' ' +this.options.next).click(function(e){
+			e.preventDefault();
+			that.hooks.next.apply(that);
 		});
-		$('.slick-controls .back').click(function(){
-			slick.hooks.back();
+		$(this.options.container + ' ' +this.options.prev).click(function(e){
+			e.preventDefault();
+			that.hooks.prev.apply(that);
 		});
-		$('.slick .current-no').html(slick.state.current+1);
-		$('.slick .total').html(slick.state.end+1);
+		$(this.options.container + ' .current-no').html(this.state.current+1);
+		$(this.options.container + ' .total').html(this.state.end+1);
+
+		if(this.options.keyControl){
+			$(document).keyup(function(e) {
+				if (e.keyCode ===  39 || e.keyCode ===  40) {
+					that.hooks.next.apply(that);        
+				}
+				if (e.keyCode ===  37 || e.keyCode ===  38) {
+					that.hooks.prev.apply(that);
+				}
+			});
+		}
 	};
 
-	$(document).keyup(function(e) {
-		if (e.keyCode ===  39 || e.keyCode ===  40) {
-			slick.hooks.next();        
-		}
-		if (e.keyCode ===  37 || e.keyCode ===  38) {
-			slick.hooks.back();
-		}
-	});
 }(jQuery, window));
