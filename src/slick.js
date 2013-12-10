@@ -1,4 +1,6 @@
+/*jshint -W117 */
 (function ($, root) {
+    'use strict';
 
     Slick = function (container, config) {
         this.options = {
@@ -13,7 +15,7 @@
             container: container
         };
 
-        for (option in this.options) {
+        for (var option in this.options) {
             if (this.options.hasOwnProperty(option)) {
                 this.options[option] = config[option] !== undefined ? config[option] : this.options[option];
             }
@@ -23,6 +25,7 @@
             current: this.options.start-1,
             start: this.options.start,
             end: this.options.end,
+            getNext: false,
 
             slide: {
                 current:0,
@@ -38,49 +41,97 @@
     SlickProto.hooks = {
         next: function() {
             if(this.state.slide.current <= this.state.slide.total){
-                var container = this.options.container;
                 if(this.options.serialSource === true){
-                    var step = ++this.state.current;
+
+                    if(this.state.getNext){
+                        this.hooks.switchNext.apply(this);
+                        this.hooks.getNext.apply(this);
+                    }
+                    else {
+                        var that = this;
+                        var container = this.options.container;
+                        $(container + ' '+this.options.contentClass+' img.loader-next').load(function(){
+                            that.hooks.switchNext.apply(that);
+                            that.hooks.getNext.apply(that);
+                        });
+                    }
                 }
-                $(container + ' ' + this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader">');
-                
-                var that = this;
-                $(container + ' '+this.options.contentClass+' img.loader').load(function(){
-                    $(container + ' '+that.options.contentClass+' img.current').remove();
-                    $(container + ' '+that.options.contentClass+' img.loader').addClass('current').removeClass('loader');
-                })
-                $(container + ' .current-no').html(++this.state.slide.current);
             }
         },
 
-        prev: function(container){
+        getNext: function(){
+            if(this.state.slide.current <= this.state.slide.total){
+                this.state.getNext = false;
+                var container = this.options.container;
+                $(container + ' '+this.options.contentClass+' img.loader-next').remove();
+                var step = this.state.current + 1;
+                $(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader-next">');
+                this.hooks.hideElement(container + ' img.loader-next');
+                
+                var that = this;
+                $(container + ' '+this.options.contentClass+' img.loader-next').load(function(){
+                    that.state.getNext = true;
+                });
+            }
+        },
+
+        switchNext: function(){
+            this.state.current++;
+            var container = this.options.container;
+            $(container + ' '+this.options.contentClass+' img.current').remove();
+            $(container + ' '+this.options.contentClass+' img.loader-next').addClass('current').removeClass('loader-next');
+            this.hooks.showElement(container + ' '+this.options.contentClass+' img.current');
+            $(container + ' .current-no').html(++this.state.slide.current);
+        },
+
+        prev: function(){
             if(this.state.current > 0){
                 var container = this.options.container;
                 if(this.options.serialSource === true){
                     var step = --this.state.current;
-                }
-                $(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader">');
 
-                var that  = this;
-                $(container + ' '+this.options.contentClass+' img.loader').load(function(){
-                    $(container + ' '+that.options.contentClass+' img.current').remove();
-                    $(container + ' '+that.options.contentClass+' img.loader').addClass('current').removeClass('loader');
-                })
-                $(container + ' .current-no').html(--this.state.slide.current);
+                    $(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader-back">');
+                    this.hooks.hideElement(container + ' img.loader-back');
+
+                    var that  = this;
+                    $(container + ' '+this.options.contentClass+' img.loader-back').load(function(){
+                        $(container + ' '+that.options.contentClass+' img.current').remove();
+                        $(container + ' '+that.options.contentClass+' img.loader-back').addClass('current').removeClass('loader-back');
+                        that.hooks.showElement(container + ' '+that.options.contentClass+' img.current');
+                        that.hooks.getNext.apply(that);
+                    });
+                    $(container + ' .current-no').html(--this.state.slide.current);
+                }
             }
         },
 
         imagePath: function(step){
             var parts = this.options.source.split('*');
             return parts[0] + step + parts[1];
+        },
+
+        hideElement: function(element){
+            $(element).css({
+                'width': '0px',
+                'display': 'none'
+            });
+        },
+
+        showElement: function(element){
+            $(element).css({
+                'width': 'inherit',
+                'display': 'inline'
+            });
         }
+
     };
 
     SlickProto.init = function(){
         var that = this;
 
         if(this.options.serialSource === true){
-            if(typeof this.options.source === "string"){
+            if(typeof this.options.source === 'string'){
+                this.hooks.getNext.apply(this);
                 this.hooks.next.apply(this);
             }
         }
@@ -98,7 +149,7 @@
         if(this.options.keyControl){
             $(document).keyup(function(e) {
                 if (e.keyCode ===  39 || e.keyCode ===  40) {
-                    that.hooks.next.apply(that);        
+                    that.hooks.next.apply(that);
                 }
                 if (e.keyCode ===  37 || e.keyCode ===  38) {
                     that.hooks.prev.apply(that);
