@@ -1,8 +1,8 @@
-/*jshint -W117 */
+/*global jQuery */
 (function ($, root) {
     'use strict';
 
-    Slick = function (container, config) {
+    var Slick = function (container, config) {
         this.options = {
             source: undefined,
             serialSource: false,
@@ -157,5 +157,7 @@
             });
         }
     };
+
+    window.Slick = Slick;
 
 }(jQuery, window));
