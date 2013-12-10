@@ -89,6 +89,7 @@
                 $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
                 $(slick.options.content + ' img[data-slide=' + step + ']').removeClass('cached-slide').addClass('current').show();
                 slick.state.current = step;
+                slick.hooks.getSlide.apply(slick, [step+1]);
                 return;
             }
             else if(slideStatus === 2){
@@ -105,13 +106,13 @@
         // Gets the slide for the step
         getSlide: function(step){
             var slick = this;
-            
-            $(slick.options.content).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" data-slide=' + step + ' class="loading">');
-            $(slick.options.content + ' img.loading').hide();
-            $(slick.options.content + ' img.loading').load(function(){
-                $(this).removeClass('loading').addClass('cached-slide');
-            });
-
+            if(slick.hooks.slideStatus.apply(this, [step]) === 0 && step <= slick.state.end){
+                $(slick.options.content).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" data-slide=' + step + ' class="loading">');
+                $(slick.options.content + ' img.loading').hide();
+                $(slick.options.content + ' img.loading').load(function(){
+                    $(this).removeClass('loading').addClass('cached-slide');
+                });
+            }
         },
 
         slideSwitch: function(step){
@@ -120,6 +121,7 @@
                 $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
                 $(this).removeClass('cached-slide').addClass('current').show();
                 slick.state.current = step;
+                slick.hooks.getSlide.apply(slick, [step+1]);
             });
         },
 
