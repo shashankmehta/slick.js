@@ -5,7 +5,6 @@
     var Slick = function (container, config) {
         this.options = {
             source: undefined,
-            serialSource: false,
             start: undefined,
             end: undefined,
             next: '.next',
@@ -40,22 +39,19 @@
 
     SlickProto.hooks = {
         next: function() {
-            var slick = this; 
+            var slick = this;
 
             if(slick.state.slide.current <= slick.state.slide.total){
-                if(slick.options.serialSource === true){
-
-                    if(slick.state.getNext){
+                if(slick.state.getNext){
+                    slick.hooks.switchNext.apply(slick);
+                    slick.hooks.getNext.apply(slick);
+                }
+                else {
+                    var container = slick.options.container;
+                    $(container + ' '+slick.options.contentClass+' img.loader-next').load(function(){
                         slick.hooks.switchNext.apply(slick);
                         slick.hooks.getNext.apply(slick);
-                    }
-                    else {
-                        var container = slick.options.container;
-                        $(container + ' '+slick.options.contentClass+' img.loader-next').load(function(){
-                            slick.hooks.switchNext.apply(slick);
-                            slick.hooks.getNext.apply(slick);
-                        });
-                    }
+                    });
                 }
             }
         },
@@ -93,20 +89,18 @@
 
             if(slick.state.current > 0){
                 var container = slick.options.container;
-                if(slick.options.serialSource === true){
-                    var step = --slick.state.current;
+                var step = --slick.state.current;
 
-                    $(container + ' '+slick.options.contentClass).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" class="loader-back">');
-                    slick.hooks.hideElement(container + ' img.loader-back');
+                $(container + ' '+slick.options.contentClass).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" class="loader-back">');
+                slick.hooks.hideElement(container + ' img.loader-back');
 
-                    $(container + ' '+slick.options.contentClass+' img.loader-back').load(function(){
-                        $(container + ' '+slick.options.contentClass+' img.current').remove();
-                        $(container + ' '+slick.options.contentClass+' img.loader-back').addClass('current').removeClass('loader-back');
-                        slick.hooks.showElement(container + ' '+slick.options.contentClass+' img.current');
-                        slick.hooks.getNext.apply(slick);
-                    });
-                    $(container + ' .current-no').html(--slick.state.slide.current);
-                }
+                $(container + ' '+slick.options.contentClass+' img.loader-back').load(function(){
+                    $(container + ' '+slick.options.contentClass+' img.current').remove();
+                    $(container + ' '+slick.options.contentClass+' img.loader-back').addClass('current').removeClass('loader-back');
+                    slick.hooks.showElement(container + ' '+slick.options.contentClass+' img.current');
+                    slick.hooks.getNext.apply(slick);
+                });
+                $(container + ' .current-no').html(--slick.state.slide.current);
             }
         },
 
@@ -134,11 +128,9 @@
     SlickProto.init = function(){
         var slick = this;
 
-        if(slick.options.serialSource === true){
-            if(typeof slick.options.source === 'string'){
-                slick.hooks.getNext.apply(slick);
-                slick.hooks.next.apply(slick);
-            }
+        if(typeof slick.options.source === 'string'){
+            slick.hooks.getNext.apply(slick);
+            slick.hooks.next.apply(slick);
         }
         $(slick.options.container + ' ' +slick.options.next).click(function(e){
             e.preventDefault();
