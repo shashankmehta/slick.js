@@ -95,6 +95,8 @@
                 slick.hooks.slideSwitch.apply(this, [step]);
             }
             else if(slideStatus === 0){
+                // Removing on load from all previous still loading images 
+                $(slick.options.content + ' img.loading').off('load.slideSwitch').remove();
                 slick.hooks.getSlide.apply(slick, [step]);
                 slick.hooks.slideSwitch.apply(this, [step]);
             }
@@ -114,7 +116,6 @@
 
         slideSwitch: function(step){
             var slick = this;
-            $(slick.options.content + ' img.loading').off('load.slideSwitch');
             $(slick.options.content + ' img[data-slide=' + step + ']').on('load.slideSwitch', function(){
             $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
                 $(this).removeClass('cached-slide').addClass('current').show();
