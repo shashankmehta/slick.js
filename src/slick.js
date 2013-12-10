@@ -2,6 +2,10 @@
 (function ($, root) {
     'use strict';
 
+    $.fn.exists = function () {
+        return this.length !== 0;
+    };
+
     var Slick = function (container, config) {
         this.options = {
             source: undefined,
@@ -24,7 +28,7 @@
         this.options.content = this.options.container + ' ' + this.options.contentClass;
 
         this.state = {
-            // Stores slide no that is visible
+            // Stores slide url no that is visible
             current: this.options.start-1,
             
             start: this.options.start,
@@ -33,8 +37,10 @@
 
             // Stores values that is shown in controls
             slide: {
-                current:0,
-                total: this.options.end,
+                current: 0,
+                difference: (this.options.start - 1),
+                total: (this.options.end - this.options.start + 1),
+                maxHit: 0
             }
         };
         
@@ -50,73 +56,87 @@
             var slick = this;
             var container = slick.options.container;
 
-            if(slick.state.slide.current <= slick.state.slide.total){
+            if(slick.state.slide.current < slick.state.slide.total){
 
                 // Setting and displaying the current slide no
                 $(container + ' .current-no').html(++slick.state.slide.current);
 
-                // Checking if next image has loaded
-                if(slick.state.getNext){
-                    slick.hooks.switchNext.apply(slick);
-                    slick.hooks.getNext.apply(slick);
-                }
-                // Waiting for the next image to load
-                else {
-                    $(slick.options.content + ' img.loader-next').load(function(){
-                        slick.hooks.switchNext.apply(slick);
-                        slick.hooks.getNext.apply(slick);
-                    });
-                }
+                var step = slick.state.slide.current + slick.state.slide.difference;
+                slick.hooks.setSlide.apply(this, [step]);
             }
         },
 
-        // Handles fetching of image
-        getNext: function(){
-            var slick = this;
-
-            if(slick.state.slide.current <= slick.state.slide.total){
-                slick.state.getNext = false;
-
-                //Removing all previous instances of loader-next to ensure no multiples
-                $(slick.options.content + ' img.loader-next').remove();
-
-                var step = slick.state.current + 1;
-                $(slick.options.content).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" class="loader-next">');
-                $(slick.options.content + ' img.loader-next').hide();
-
-                $(slick.options.content + ' img.loader-next').load(function(){
-                    slick.state.getNext = true;
-                });
-            }
-        },
-
-        // Handles changing of images
-        switchNext: function(){
-            var slick = this;
-
-            slick.state.current++;
-            $(slick.options.content + ' img.current').remove();
-            $(slick.options.content + ' img.loader-next').addClass('current').removeClass('loader-next').show();
-        },
-
-        // Handles loading and switching for going back a slide
+        // Main function for handling going backward
         prev: function(){
             var slick = this;
+            var container = slick.options.container;
 
-            if(slick.state.current > 0){
-                var container = slick.options.container;
-                var step = --slick.state.current;
+            if(slick.state.slide.current > 1){
 
-                $(slick.options.content).append('<img src="' + slick.hooks.imagePath.apply(slick, [step]) + '" class="loader-back">');
-                $(slick.options.content + ' img.loader-back').hide();
-
-                $(slick.options.content + ' img.loader-back').load(function(){
-                    $(slick.options.content + ' img.current').remove();
-                    $(slick.options.content + ' img.loader-back').addClass('current').removeClass('loader-back').show();
-                    slick.hooks.getNext.apply(slick);
-                });
+                // Setting and displaying the current slide no
                 $(container + ' .current-no').html(--slick.state.slide.current);
+
+                var step = slick.state.slide.current + slick.state.slide.difference;
+                slick.hooks.setSlide.apply(this, [step]);
             }
+        },
+
+        setSlide: function(step){
+            var slick = this;
+            var slideStatus = slick.hooks.slideStatus.apply(slick, [step]);
+            
+            if(slideStatus === 1){
+                $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
+                $(slick.options.content + ' img[data-slide=' + step + ']').removeClass('cached-slide').addClass('current').show();
+                slick.state.current = step;
+                return;
+            }
+            else if(slideStatus === 2){
+                slick.hooks.slideSwitch.apply(this, [step]);
+            }
+            else if(slideStatus === 0){
+                slick.hooks.getSlide.apply(slick, [step]);
+                slick.hooks.slideSwitch.apply(this, [step]);
+            }
+        },
+
+        // Gets the slide for the step
+        getSlide: function(step){
+            var slick = this;
+            
+            $(slick.options.content).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" data-slide=' + step + ' class="loading">');
+            $(slick.options.content + ' img.loading').hide();
+            $(slick.options.content + ' img.loading').load(function(){
+                $(this).removeClass('loading').addClass('cached-slide');
+            });
+
+        },
+
+        slideSwitch: function(step){
+            var slick = this;
+            $(slick.options.content + ' img.loading').off('load.slideSwitch');
+            $(slick.options.content + ' img[data-slide=' + step + ']').on('load.slideSwitch', function(){
+            $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
+                $(this).removeClass('cached-slide').addClass('current').show();
+                slick.state.current = step;
+            });            
+        },
+
+        // Returns the status of a slide
+        // 0: Not requested yet
+        // 1: cached
+        // 2: loading
+        slideStatus: function(step){
+            var slick = this;
+            var el = slick.options.content + ' img[data-slide=' + step + ']';
+            if($(el).exists()){
+                if($(el).hasClass('loading'))
+                    return 2;
+                else
+                    return 1;
+            }
+            else
+                return 0;
         },
 
         // Returns the path with the current no inserted
@@ -132,7 +152,6 @@
 
         // Sets the first slide
         if(typeof slick.options.source === 'string'){
-            slick.hooks.getNext.apply(slick);
             slick.hooks.next.apply(slick);
         }
 
