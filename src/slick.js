@@ -11,7 +11,8 @@
             prev: '.prev',
             contentClass: '.slick-content',
             keyControl: true,
-            container: container
+            container: container,
+            content: undefined
         };
 
         for (var option in this.options) {
@@ -19,6 +20,8 @@
                 this.options[option] = config[option] !== undefined ? config[option] : this.options[option];
             }
         }
+
+        this.options.content = this.options.container + ' ' + this.options.contentClass;
 
         this.state = {
             // Stores slide no that is visible
@@ -59,7 +62,7 @@
                 }
                 // Waiting for the next image to load
                 else {
-                    $(container + ' ' + slick.options.contentClass + ' img.loader-next').load(function(){
+                    $(slick.options.content + ' img.loader-next').load(function(){
                         slick.hooks.switchNext.apply(slick);
                         slick.hooks.getNext.apply(slick);
                     });
@@ -73,16 +76,15 @@
 
             if(slick.state.slide.current <= slick.state.slide.total){
                 slick.state.getNext = false;
-                var container = slick.options.container;
 
                 //Removing all previous instances of loader-next to ensure no multiples
-                $(container + ' ' + slick.options.contentClass + ' img.loader-next').remove();
+                $(slick.options.content + ' img.loader-next').remove();
 
                 var step = slick.state.current + 1;
-                $(container + ' ' + slick.options.contentClass).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" class="loader-next">');
-                $(container + ' ' + slick.options.contentClass + ' img.loader-next').hide();
+                $(slick.options.content).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" class="loader-next">');
+                $(slick.options.content + ' img.loader-next').hide();
 
-                $(container + ' ' + slick.options.contentClass + ' img.loader-next').load(function(){
+                $(slick.options.content + ' img.loader-next').load(function(){
                     slick.state.getNext = true;
                 });
             }
@@ -93,9 +95,8 @@
             var slick = this;
 
             slick.state.current++;
-            var container = slick.options.container;
-            $(container + ' ' + slick.options.contentClass + ' img.current').remove();
-            $(container + ' ' + slick.options.contentClass + ' img.loader-next').addClass('current').removeClass('loader-next').show();
+            $(slick.options.content + ' img.current').remove();
+            $(slick.options.content + ' img.loader-next').addClass('current').removeClass('loader-next').show();
         },
 
         // Handles loading and switching for going back a slide
@@ -106,12 +107,12 @@
                 var container = slick.options.container;
                 var step = --slick.state.current;
 
-                $(container + ' ' + slick.options.contentClass).append('<img src="' + slick.hooks.imagePath.apply(slick, [step]) + '" class="loader-back">');
-                $(container + ' ' + slick.options.contentClass + ' img.loader-back').hide();
+                $(slick.options.content).append('<img src="' + slick.hooks.imagePath.apply(slick, [step]) + '" class="loader-back">');
+                $(slick.options.content + ' img.loader-back').hide();
 
-                $(container + ' ' + slick.options.contentClass + ' img.loader-back').load(function(){
-                    $(container + ' ' + slick.options.contentClass + ' img.current').remove();
-                    $(container + ' ' + slick.options.contentClass + ' img.loader-back').addClass('current').removeClass('loader-back').show();
+                $(slick.options.content + ' img.loader-back').load(function(){
+                    $(slick.options.content + ' img.current').remove();
+                    $(slick.options.content + ' img.loader-back').addClass('current').removeClass('loader-back').show();
                     slick.hooks.getNext.apply(slick);
                 });
                 $(container + ' .current-no').html(--slick.state.slide.current);
