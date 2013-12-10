@@ -1,6 +1,6 @@
 #Slick Presentation Embedding
 
-Slick was developed for Study Portal, an application for IIT Roorkee intranet made by SDSLabs. We needed to embed presentation but could not utilize SpeakerDeck/SlideShare embedding thanks to 2AM - 5AM Mon-Fri Internet blackout in the campus. We were not going to show empty divs during the blackout, right?
+Slick was developed for Study Portal, an application for IIT Roorkee intranet made by SDSLabs. We needed to embed presentations but could not utilize SpeakerDeck/SlideShare embedding thanks to 2AM-5AM Mon-Fri Internet blackout in the campus. We were not going to show empty divs during the blackout, right?
 
 ##Working
 
