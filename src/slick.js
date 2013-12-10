@@ -40,19 +40,20 @@
 
     SlickProto.hooks = {
         next: function() {
-            if(this.state.slide.current <= this.state.slide.total){
-                if(this.options.serialSource === true){
+            var slick = this; 
 
-                    if(this.state.getNext){
-                        this.hooks.switchNext.apply(this);
-                        this.hooks.getNext.apply(this);
+            if(slick.state.slide.current <= slick.state.slide.total){
+                if(slick.options.serialSource === true){
+
+                    if(slick.state.getNext){
+                        slick.hooks.switchNext.apply(slick);
+                        slick.hooks.getNext.apply(slick);
                     }
                     else {
-                        var that = this;
-                        var container = this.options.container;
-                        $(container + ' '+this.options.contentClass+' img.loader-next').load(function(){
-                            that.hooks.switchNext.apply(that);
-                            that.hooks.getNext.apply(that);
+                        var container = slick.options.container;
+                        $(container + ' '+slick.options.contentClass+' img.loader-next').load(function(){
+                            slick.hooks.switchNext.apply(slick);
+                            slick.hooks.getNext.apply(slick);
                         });
                     }
                 }
@@ -60,47 +61,51 @@
         },
 
         getNext: function(){
-            if(this.state.slide.current <= this.state.slide.total){
-                this.state.getNext = false;
-                var container = this.options.container;
-                $(container + ' '+this.options.contentClass+' img.loader-next').remove();
-                var step = this.state.current + 1;
-                $(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader-next">');
-                this.hooks.hideElement(container + ' img.loader-next');
+            var slick = this;
+
+            if(slick.state.slide.current <= slick.state.slide.total){
+                slick.state.getNext = false;
+                var container = slick.options.container;
+                $(container + ' '+slick.options.contentClass+' img.loader-next').remove();
+                var step = slick.state.current + 1;
+                $(container + ' '+slick.options.contentClass).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" class="loader-next">');
+                slick.hooks.hideElement(container + ' img.loader-next');
                 
-                var that = this;
-                $(container + ' '+this.options.contentClass+' img.loader-next').load(function(){
-                    that.state.getNext = true;
+                $(container + ' '+slick.options.contentClass+' img.loader-next').load(function(){
+                    slick.state.getNext = true;
                 });
             }
         },
 
         switchNext: function(){
-            this.state.current++;
-            var container = this.options.container;
-            $(container + ' '+this.options.contentClass+' img.current').remove();
-            $(container + ' '+this.options.contentClass+' img.loader-next').addClass('current').removeClass('loader-next');
-            this.hooks.showElement(container + ' '+this.options.contentClass+' img.current');
-            $(container + ' .current-no').html(++this.state.slide.current);
+            var slick = this;
+
+            slick.state.current++;
+            var container = slick.options.container;
+            $(container + ' '+slick.options.contentClass+' img.current').remove();
+            $(container + ' '+slick.options.contentClass+' img.loader-next').addClass('current').removeClass('loader-next');
+            slick.hooks.showElement(container + ' '+slick.options.contentClass+' img.current');
+            $(container + ' .current-no').html(++slick.state.slide.current);
         },
 
         prev: function(){
-            if(this.state.current > 0){
-                var container = this.options.container;
-                if(this.options.serialSource === true){
-                    var step = --this.state.current;
+            var slick = this;
 
-                    $(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader-back">');
-                    this.hooks.hideElement(container + ' img.loader-back');
+            if(slick.state.current > 0){
+                var container = slick.options.container;
+                if(slick.options.serialSource === true){
+                    var step = --slick.state.current;
 
-                    var that  = this;
-                    $(container + ' '+this.options.contentClass+' img.loader-back').load(function(){
-                        $(container + ' '+that.options.contentClass+' img.current').remove();
-                        $(container + ' '+that.options.contentClass+' img.loader-back').addClass('current').removeClass('loader-back');
-                        that.hooks.showElement(container + ' '+that.options.contentClass+' img.current');
-                        that.hooks.getNext.apply(that);
+                    $(container + ' '+slick.options.contentClass).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" class="loader-back">');
+                    slick.hooks.hideElement(container + ' img.loader-back');
+
+                    $(container + ' '+slick.options.contentClass+' img.loader-back').load(function(){
+                        $(container + ' '+slick.options.contentClass+' img.current').remove();
+                        $(container + ' '+slick.options.contentClass+' img.loader-back').addClass('current').removeClass('loader-back');
+                        slick.hooks.showElement(container + ' '+slick.options.contentClass+' img.current');
+                        slick.hooks.getNext.apply(slick);
                     });
-                    $(container + ' .current-no').html(--this.state.slide.current);
+                    $(container + ' .current-no').html(--slick.state.slide.current);
                 }
             }
         },
@@ -127,32 +132,32 @@
     };
 
     SlickProto.init = function(){
-        var that = this;
+        var slick = this;
 
-        if(this.options.serialSource === true){
-            if(typeof this.options.source === 'string'){
-                this.hooks.getNext.apply(this);
-                this.hooks.next.apply(this);
+        if(slick.options.serialSource === true){
+            if(typeof slick.options.source === 'string'){
+                slick.hooks.getNext.apply(slick);
+                slick.hooks.next.apply(slick);
             }
         }
-        $(this.options.container + ' ' +this.options.next).click(function(e){
+        $(slick.options.container + ' ' +slick.options.next).click(function(e){
             e.preventDefault();
-            that.hooks.next.apply(that);
+            slick.hooks.next.apply(slick);
         });
-        $(this.options.container + ' ' +this.options.prev).click(function(e){
+        $(slick.options.container + ' ' +slick.options.prev).click(function(e){
             e.preventDefault();
-            that.hooks.prev.apply(that);
+            slick.hooks.prev.apply(slick);
         });
-        $(this.options.container + ' .current-no').html(this.state.current+1);
-        $(this.options.container + ' .total').html(this.state.end+1);
+        $(slick.options.container + ' .current-no').html(slick.state.current+1);
+        $(slick.options.container + ' .total').html(slick.state.end+1);
 
-        if(this.options.keyControl){
+        if(slick.options.keyControl){
             $(document).keyup(function(e) {
                 if (e.keyCode ===  39 || e.keyCode ===  40) {
-                    that.hooks.next.apply(that);
+                    slick.hooks.next.apply(slick);
                 }
                 if (e.keyCode ===  37 || e.keyCode ===  38) {
-                    that.hooks.prev.apply(that);
+                    slick.hooks.prev.apply(slick);
                 }
             });
         }
