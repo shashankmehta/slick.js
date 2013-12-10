@@ -117,10 +117,10 @@
         slideSwitch: function(step){
             var slick = this;
             $(slick.options.content + ' img[data-slide=' + step + ']').on('load.slideSwitch', function(){
-            $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
+                $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
                 $(this).removeClass('cached-slide').addClass('current').show();
                 slick.state.current = step;
-            });            
+            });
         },
 
         // Returns the status of a slide
@@ -131,13 +131,16 @@
             var slick = this;
             var el = slick.options.content + ' img[data-slide=' + step + ']';
             if($(el).exists()){
-                if($(el).hasClass('loading'))
+                if($(el).hasClass('loading')){
                     return 2;
-                else
+                }
+                else {
                     return 1;
+                }
             }
-            else
+            else {
                 return 0;
+            }
         },
 
         // Returns the path with the current no inserted
@@ -145,6 +148,10 @@
             var parts = this.options.source.split('*');
             return parts[0] + step + parts[1];
         },
+
+        check: function(){
+            console.log(this);
+        }
 
     };
 
@@ -181,5 +188,17 @@
     };
 
     window.Slick = Slick;
+
+    Slick.next = function(slick){
+        if(slick.constructor === Slick){  
+            slick.hooks.next.apply(slick);
+        }
+    };
+
+    Slick.prev = function(slick){
+        if(slick.constructor === Slick){  
+            slick.hooks.prev.apply(slick);
+        }
+    };
 
 }(jQuery, window));
