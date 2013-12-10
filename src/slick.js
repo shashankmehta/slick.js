@@ -192,13 +192,13 @@
     window.Slick = Slick;
 
     Slick.next = function(slick){
-        if(slick.constructor === Slick){  
+        if(slick.constructor === Slick){
             slick.hooks.next.apply(slick);
         }
     };
 
     Slick.prev = function(slick){
-        if(slick.constructor === Slick){  
+        if(slick.constructor === Slick){
             slick.hooks.prev.apply(slick);
         }
     };

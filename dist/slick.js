@@ -1,6 +1,6 @@
 /*!
 * slick.js
-* v0.5.0 - 2013-12-10
+* v0.5.0 - 2013-12-11
 * https://github.com/shashankmehta/slick.js
 * (c) Shashank Mehta; MIT License
 */
@@ -8,17 +8,21 @@
 (function ($, root) {
     'use strict';
 
+    $.fn.exists = function () {
+        return this.length !== 0;
+    };
+
     var Slick = function (container, config) {
         this.options = {
             source: undefined,
-            serialSource: false,
             start: undefined,
             end: undefined,
             next: '.next',
             prev: '.prev',
             contentClass: '.slick-content',
             keyControl: true,
-            container: container
+            container: container,
+            content: undefined
         };
 
         for (var option in this.options) {
@@ -27,15 +31,22 @@
             }
         }
 
+        this.options.content = this.options.container + ' ' + this.options.contentClass;
+
         this.state = {
+            // Stores slide url no that is visible
             current: this.options.start-1,
+            
             start: this.options.start,
             end: this.options.end,
             getNext: false,
 
+            // Stores values that is shown in controls
             slide: {
-                current:0,
-                total: this.options.end,
+                current: 0,
+                difference: (this.options.start - 1),
+                total: (this.options.end - this.options.start + 1),
+                maxHit: 0
             }
         };
         
@@ -45,125 +56,157 @@
     var SlickProto = Slick.prototype;
 
     SlickProto.hooks = {
-        next: function() {
-            if(this.state.slide.current <= this.state.slide.total){
-                if(this.options.serialSource === true){
 
-                    if(this.state.getNext){
-                        this.hooks.switchNext.apply(this);
-                        this.hooks.getNext.apply(this);
-                    }
-                    else {
-                        var that = this;
-                        var container = this.options.container;
-                        $(container + ' '+this.options.contentClass+' img.loader-next').load(function(){
-                            that.hooks.switchNext.apply(that);
-                            that.hooks.getNext.apply(that);
-                        });
-                    }
-                }
+        // Main function for handling next/forwarding of slides
+        next: function() {
+            var slick = this;
+            var container = slick.options.container;
+
+            if(slick.state.slide.current < slick.state.slide.total){
+
+                // Setting and displaying the current slide no
+                $(container + ' .current-no').html(++slick.state.slide.current);
+
+                var step = slick.state.slide.current + slick.state.slide.difference;
+                slick.hooks.setSlide.apply(this, [step]);
             }
         },
 
-        getNext: function(){
-            if(this.state.slide.current <= this.state.slide.total){
-                this.state.getNext = false;
-                var container = this.options.container;
-                $(container + ' '+this.options.contentClass+' img.loader-next').remove();
-                var step = this.state.current + 1;
-                $(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader-next">');
-                this.hooks.hideElement(container + ' img.loader-next');
-                
-                var that = this;
-                $(container + ' '+this.options.contentClass+' img.loader-next').load(function(){
-                    that.state.getNext = true;
+        // Main function for handling going backward
+        prev: function(){
+            var slick = this;
+            var container = slick.options.container;
+
+            if(slick.state.slide.current > 1){
+
+                // Setting and displaying the current slide no
+                $(container + ' .current-no').html(--slick.state.slide.current);
+
+                var step = slick.state.slide.current + slick.state.slide.difference;
+                slick.hooks.setSlide.apply(this, [step]);
+            }
+        },
+
+        setSlide: function(step){
+            var slick = this;
+            var slideStatus = slick.hooks.slideStatus.apply(slick, [step]);
+            
+            if(slideStatus === 1){
+                $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
+                $(slick.options.content + ' img[data-slide=' + step + ']').removeClass('cached-slide').addClass('current').show();
+                slick.state.current = step;
+                slick.hooks.getSlide.apply(slick, [step+1]);
+                return;
+            }
+            else if(slideStatus === 2){
+                slick.hooks.slideSwitch.apply(this, [step]);
+            }
+            else if(slideStatus === 0){
+                // Removing on load from all previous still loading images 
+                $(slick.options.content + ' img.loading').off('load.slideSwitch').remove();
+                slick.hooks.getSlide.apply(slick, [step]);
+                slick.hooks.slideSwitch.apply(this, [step]);
+            }
+        },
+
+        // Gets the slide for the step
+        getSlide: function(step){
+            var slick = this;
+            if(slick.hooks.slideStatus.apply(this, [step]) === 0 && step <= slick.state.end){
+                $(slick.options.content).append('<img src="'+ slick.hooks.imagePath.apply(slick, [step]) +'" data-slide=' + step + ' class="loading">');
+                $(slick.options.content + ' img.loading').hide();
+                $(slick.options.content + ' img.loading').load(function(){
+                    $(this).removeClass('loading').addClass('cached-slide');
                 });
             }
         },
 
-        switchNext: function(){
-            this.state.current++;
-            var container = this.options.container;
-            $(container + ' '+this.options.contentClass+' img.current').remove();
-            $(container + ' '+this.options.contentClass+' img.loader-next').addClass('current').removeClass('loader-next');
-            this.hooks.showElement(container + ' '+this.options.contentClass+' img.current');
-            $(container + ' .current-no').html(++this.state.slide.current);
+        slideSwitch: function(step){
+            var slick = this;
+            $(slick.options.content + ' img[data-slide=' + step + ']').on('load.slideSwitch', function(){
+                $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
+                $(this).removeClass('cached-slide').addClass('current').show();
+                slick.state.current = step;
+                slick.hooks.getSlide.apply(slick, [step+1]);
+            });
         },
 
-        prev: function(){
-            if(this.state.current > 0){
-                var container = this.options.container;
-                if(this.options.serialSource === true){
-                    var step = --this.state.current;
-
-                    $(container + ' '+this.options.contentClass).append('<img src="'+ this.hooks.imagePath.apply(this, [step]) +'" class="loader-back">');
-                    this.hooks.hideElement(container + ' img.loader-back');
-
-                    var that  = this;
-                    $(container + ' '+this.options.contentClass+' img.loader-back').load(function(){
-                        $(container + ' '+that.options.contentClass+' img.current').remove();
-                        $(container + ' '+that.options.contentClass+' img.loader-back').addClass('current').removeClass('loader-back');
-                        that.hooks.showElement(container + ' '+that.options.contentClass+' img.current');
-                        that.hooks.getNext.apply(that);
-                    });
-                    $(container + ' .current-no').html(--this.state.slide.current);
+        // Returns the status of a slide
+        // 0: Not requested yet
+        // 1: cached
+        // 2: loading
+        slideStatus: function(step){
+            var slick = this;
+            var el = slick.options.content + ' img[data-slide=' + step + ']';
+            if($(el).exists()){
+                if($(el).hasClass('loading')){
+                    return 2;
                 }
+                else {
+                    return 1;
+                }
+            }
+            else {
+                return 0;
             }
         },
 
+        // Returns the path with the current no inserted
         imagePath: function(step){
             var parts = this.options.source.split('*');
             return parts[0] + step + parts[1];
         },
 
-        hideElement: function(element){
-            $(element).css({
-                'width': '0px',
-                'display': 'none'
-            });
-        },
-
-        showElement: function(element){
-            $(element).css({
-                'width': 'inherit',
-                'display': 'inline'
-            });
+        check: function(){
+            console.log(this);
         }
 
     };
 
     SlickProto.init = function(){
-        var that = this;
+        var slick = this;
 
-        if(this.options.serialSource === true){
-            if(typeof this.options.source === 'string'){
-                this.hooks.getNext.apply(this);
-                this.hooks.next.apply(this);
-            }
+        // Sets the first slide
+        if(typeof slick.options.source === 'string'){
+            slick.hooks.next.apply(slick);
         }
-        $(this.options.container + ' ' +this.options.next).click(function(e){
-            e.preventDefault();
-            that.hooks.next.apply(that);
-        });
-        $(this.options.container + ' ' +this.options.prev).click(function(e){
-            e.preventDefault();
-            that.hooks.prev.apply(that);
-        });
-        $(this.options.container + ' .current-no').html(this.state.current+1);
-        $(this.options.container + ' .total').html(this.state.end+1);
 
-        if(this.options.keyControl){
+        // Attaches event listeners for next/prev buttons
+        $(slick.options.container + ' ' + slick.options.next).click(function(e){
+            e.preventDefault();
+            slick.hooks.next.apply(slick);
+        });
+        $(slick.options.container + ' ' + slick.options.prev).click(function(e){
+            e.preventDefault();
+            slick.hooks.prev.apply(slick);
+        });
+        $(slick.options.container + ' .total').html(slick.state.end - slick.state.start + 1);
+
+        // Ataches keyboard control
+        if(slick.options.keyControl){
             $(document).keyup(function(e) {
                 if (e.keyCode ===  39 || e.keyCode ===  40) {
-                    that.hooks.next.apply(that);
+                    slick.hooks.next.apply(slick);
                 }
                 if (e.keyCode ===  37 || e.keyCode ===  38) {
-                    that.hooks.prev.apply(that);
+                    slick.hooks.prev.apply(slick);
                 }
             });
         }
     };
 
     window.Slick = Slick;
+
+    Slick.next = function(slick){
+        if(slick.constructor === Slick){
+            slick.hooks.next.apply(slick);
+        }
+    };
+
+    Slick.prev = function(slick){
+        if(slick.constructor === Slick){
+            slick.hooks.prev.apply(slick);
+        }
+    };
 
 }(jQuery, window));
