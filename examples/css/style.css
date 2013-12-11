@@ -16,6 +16,6 @@
     .slick .slick-bottom .slick-no {
       float: right;
       padding-right: 10px; }
-  .slick .loader {
-    width: 0px;
-    display: none; }
+      .slick .slick-bottom .slick-no .skip {
+        width: 20px;
+        padding: 0px; }

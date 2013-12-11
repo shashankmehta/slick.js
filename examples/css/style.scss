@@ -26,11 +26,11 @@
 		.slick-no {
 			float: right;
 			padding-right: 10px;
-		}
-	}
 
-	.loader{
-		width: 0px;
-		display: none;
+			.skip {
+				width: 20px;
+				padding: 0px;
+			}
+		}
 	}
 }

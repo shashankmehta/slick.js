@@ -54,14 +54,9 @@
         // Main function for handling next/forwarding of slides
         next: function() {
             var slick = this;
-            var container = slick.options.container;
 
             if(slick.state.slide.current < slick.state.slide.total){
-
-                // Setting and displaying the current slide no
-                $(container + ' .current-no').html(++slick.state.slide.current);
-
-                var step = slick.state.slide.current + slick.state.slide.difference;
+                var step = ++slick.state.slide.current + slick.state.slide.difference;
                 slick.hooks.setSlide.apply(this, [step]);
             }
         },
@@ -69,14 +64,9 @@
         // Main function for handling going backward
         prev: function(){
             var slick = this;
-            var container = slick.options.container;
 
             if(slick.state.slide.current > 1){
-
-                // Setting and displaying the current slide no
-                $(container + ' .current-no').html(--slick.state.slide.current);
-
-                var step = slick.state.slide.current + slick.state.slide.difference;
+                var step = --slick.state.slide.current + slick.state.slide.difference;
                 slick.hooks.setSlide.apply(this, [step]);
             }
         },
@@ -84,6 +74,15 @@
         setSlide: function(step){
             var slick = this;
             var slideStatus = slick.hooks.slideStatus.apply(slick, [step]);
+            slick.state.slide.current = step - slick.state.slide.difference;
+
+            if($(slick.options.container + ' .skip.current-no').is(':input')){
+                $(slick.options.container + ' .current-no').val(slick.state.slide.current);
+            }
+            else {
+                $(slick.options.container + ' .skip').val(slick.state.slide.current);
+                $(slick.options.container + ' .current-no').html(slick.state.slide.current);
+            }
             
             if(slideStatus === 1){
                 $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
@@ -151,8 +150,14 @@
             return parts[0] + step + parts[1];
         },
 
-        check: function(){
-            console.log(this);
+        skip: function(val){
+            if($.isNumeric(val)){
+                var slick = this;
+
+                var step = parseInt(val) + slick.state.slide.difference;
+                slick.hooks.getSlide.apply(slick, [step]);
+                slick.hooks.setSlide.apply(slick, [step]);
+            }
         }
 
     };
@@ -187,10 +192,18 @@
                 }
             });
         }
+        
+        $(slick.options.container + ' .skip').keypress(function(e){
+            if(e.keyCode === 13){
+                slick.hooks.skip.apply(slick, [$(this).val()]);
+                $(this).blur();
+            }
+        });
     };
 
     window.Slick = Slick;
 
+    // Exposing programmatic access
     Slick.next = function(slick){
         if(slick.constructor === Slick){
             slick.hooks.next.apply(slick);
@@ -200,6 +213,12 @@
     Slick.prev = function(slick){
         if(slick.constructor === Slick){
             slick.hooks.prev.apply(slick);
+        }
+    };
+
+    Slick.skip = function(slick, step){
+        if(slick.constructor === Slick){
+            slick.hooks.skip.apply(slick, [step]);
         }
     };
 
