@@ -87,6 +87,10 @@
             var slideStatus = slick.hooks.slideStatus.apply(slick, [step]);
             slick.state.slide.current = step - slick.state.slide.difference;
 
+            if(slick.state.slide.current === 1){
+                $(slick.options.theme.container).animate({'opacity': '1'}, 500);
+            }
+
             if($(slick.options.theme.container + ' .skip' + slick.options.theme.currentNo).is(':input')){
                 $(slick.options.theme.container + ' ' + slick.options.theme.currentNo).val(slick.state.slide.current);
             }
@@ -177,6 +181,8 @@
 
     SlickProto.init = function(){
         var slick = this;
+
+        $(slick.options.theme.container).css('opacity', '0');
 
         // Sets the first slide
         if(typeof slick.options.source === 'string'){
