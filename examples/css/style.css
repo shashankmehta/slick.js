@@ -3,13 +3,15 @@
   border: 1px solid #ccc; }
   .slick .slick-content {
     width: inherit;
-    height: 375px; }
+    text-align: center; }
     .slick .slick-content img {
       width: inherit; }
   .slick .slick-bottom {
     border-top: 1px solid #ccc;
     height: 25px;
-    padding-top: 5px; }
+    padding-top: 5px;
+    width: inherit;
+    background: white; }
     .slick .slick-bottom .slick-controls img {
       width: 20px;
       margin-left: 5px; }
@@ -19,3 +21,19 @@
       .slick .slick-bottom .slick-no .skip {
         width: 20px;
         padding: 0px; }
+      .slick .slick-bottom .slick-no .fullscreen {
+        padding-left: 10px;
+        width: 17px;
+        padding-top: 2px; }
+      .slick .slick-bottom .slick-no div {
+        float: right; }
+
+.fullscreen {
+  width: initial;
+  border: none; }
+  .fullscreen .slick-content {
+    width: initial;
+    height: calc(100% - 30px); }
+    .fullscreen .slick-content img {
+      width: initial;
+      height: 100%; }

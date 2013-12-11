@@ -1,15 +1,26 @@
 <head>
 	<link rel="stylesheet" href="css/style.css">
 	<script src="js/jquery-1.7.2.min.js"></script>
+	<script src="../src/screenfull.js"></script>
 	<script src="../src/slick.js"></script>
 </head>
 
+<!-- Main Container. Class goes in Slick constructor call -->
 <div class="slick">
+
+	<!-- This will containt the images -->
 	<div class="slick-content">
 	</div>
+
+	<!-- This contains the controls -->
 	<div class="slick-bottom">
 		<div class="slick-no">
-			<input type="text" class="current-no skip">/<span class="total"></span>
+			<div>
+				<img src="img/fullscreen.png" alt="" class="fullscreen">
+			</div>
+			<div>
+				<input type="text" class="current-no skip">/<span class="total"></span>
+			</div>
 		</div>
 		<div class="slick-controls">
 			<a href="#" class="prev"><img src="img/backward.png" alt=""></a>
@@ -17,14 +28,32 @@
 		</div>
 	</div>
 </div>
+
 <script>
 	config = {
 		source: 'slide/slick-*.jpg',
 		start: 0,
 		end: 5,
-		keyControl: true
 	};
 
 	slick = new Slick('.slick', config);
-
+	
+	$('.fullscreen').click(function () {
+		if (screenfull.enabled) {
+			screenfull.request($('.slick')[0]);
+			
+			// Needed because of a Chrome quirk. 
+			setTimeout(function(){
+				$('.slick').addClass('fullscreen');
+				$('.slick .slick-bottom').width($('.slick-content img.current').width()).css('margin', 'auto');
+			}, 100);
+		}
+	});
+	screenfull.onchange = function(){
+		// Undoing changes done through setTimeout above
+		if(!screenfull.isFullscreen){
+			$('.slick .slick-bottom').width('inherit').css('margin', 'auto');
+			$('.slick').removeClass('fullscreen');
+		};
+	}
 </script>

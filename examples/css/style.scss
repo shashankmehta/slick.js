@@ -4,7 +4,7 @@
 	
 	.slick-content{
 		width: inherit;
-		height: 375px;
+		text-align: center;
 
 		img {
 			width: inherit;
@@ -15,6 +15,8 @@
 		border-top: 1px solid #ccc;
 		height: 25px;
 		padding-top: 5px;
+		width: inherit;
+		background: white;
 		
 		.slick-controls {
 			img {
@@ -31,6 +33,31 @@
 				width: 20px;
 				padding: 0px;
 			}
+
+			.fullscreen {
+				padding-left: 10px;
+				width: 17px;
+				padding-top: 2px;
+			}
+
+			div {
+				float: right;
+			}
+		}
+	}
+}
+
+.fullscreen {
+	width: initial;
+	border: none;
+
+	.slick-content {
+		width: initial;
+		height: calc(100% - 30px);
+
+		img {
+			width: initial;
+			height: 100%;
 		}
 	}
 }
