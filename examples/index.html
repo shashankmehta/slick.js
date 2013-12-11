@@ -22,10 +22,10 @@
 	<div class="slick-bottom">
 		<div class="slick-no">
 			<div>
-				<img src="img/fullscreen.png" alt="" class="fullscreen">
+				<input type="text" class="current-no skip">/<span class="total"></span>
 			</div>
 			<div>
-				<input type="text" class="current-no skip">/<span class="total"></span>
+				<img src="img/fullscreen.png" alt="" class="fullscr">
 			</div>
 		</div>
 		<div class="slick-controls">
@@ -51,7 +51,7 @@
 		Slick.prev(slick);
 	})
 	
-	$('.fullscreen').click(function () {
+	$('.fullscr').click(function () {
 		if (screenfull.enabled) {
 			screenfull.request($('.slick')[0]);
 			
