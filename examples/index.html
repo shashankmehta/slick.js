@@ -57,13 +57,14 @@
 	
 	$('.fullscr').click(function () {
 		if (screenfull.enabled) {
-			screenfull.request($('.slick')[0]);
-			
-			// Needed because of a Chrome quirk. 
-			setTimeout(function(){
-				$('.slick').addClass('fullscreen');
-				$('.slick .slick-bottom').width($('.slick-content img.current').width()).css('margin', 'auto');
-			}, 100);
+			screenfull.toggle($('.slick')[0]);
+			if(!$('.slick.fullscreen').exists()){
+				// Needed because of a Chrome quirk. 
+				setTimeout(function(){
+					$('.slick').addClass('fullscreen');
+					$('.slick .slick-bottom').width($('.slick-content img.current').width()).css('margin', 'auto');
+				}, 100);
+			}
 		}
 	});
 	screenfull.onchange = function(){
@@ -71,6 +72,6 @@
 		if(!screenfull.isFullscreen){
 			$('.slick .slick-bottom').width('inherit').css('margin', 'auto');
 			$('.slick').removeClass('fullscreen');
-		};
+		};		
 	}
 </script>
