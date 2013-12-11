@@ -11,21 +11,33 @@
             source: undefined,
             start: undefined,
             end: undefined,
-            next: '.next',
-            prev: '.prev',
-            contentClass: '.slick-content',
             keyControl: true,
-            container: container,
-            content: undefined
+            content: undefined,
+            theme: {
+                container: container,
+                content: '.slick-content',
+                currentNo: '.current-no',
+                totalNo: '.total',
+                next: '.next',
+                prev: '.prev',
+            }
         };
 
         for (var option in this.options) {
-            if (this.options.hasOwnProperty(option)) {
+            if (this.options.hasOwnProperty(option) && option !== 'theme') {
                 this.options[option] = config[option] !== undefined ? config[option] : this.options[option];
             }
         }
 
-        this.options.content = this.options.container + ' ' + this.options.contentClass;
+        if(config.theme !== undefined){
+            for (var val in this.options.theme) {
+                if (this.options.theme.hasOwnProperty(val)) {
+                    this.options.theme[val] = config.theme[val] !== undefined ? config.theme[val] : this.options.theme[val];
+                }
+            }
+        }
+
+        this.options.content = this.options.theme.container + ' ' + this.options.theme.content;
 
         this.state = {
             // Stores slide url no that is visible
@@ -33,7 +45,6 @@
             
             start: this.options.start,
             end: this.options.end,
-            getNext: false,
 
             // Stores values that is shown in controls
             slide: {
@@ -76,12 +87,12 @@
             var slideStatus = slick.hooks.slideStatus.apply(slick, [step]);
             slick.state.slide.current = step - slick.state.slide.difference;
 
-            if($(slick.options.container + ' .skip.current-no').is(':input')){
-                $(slick.options.container + ' .current-no').val(slick.state.slide.current);
+            if($(slick.options.theme.container + ' .skip' + slick.options.theme.currentNo).is(':input')){
+                $(slick.options.theme.container + ' ' + slick.options.theme.currentNo).val(slick.state.slide.current);
             }
             else {
-                $(slick.options.container + ' .skip').val(slick.state.slide.current);
-                $(slick.options.container + ' .current-no').html(slick.state.slide.current);
+                $(slick.options.theme.container + ' .skip').val(slick.state.slide.current);
+                $(slick.options.theme.container + ' ' + slick.options.theme.currentNo).html(slick.state.slide.current);
             }
             
             if(slideStatus === 1){
@@ -171,15 +182,15 @@
         }
 
         // Attaches event listeners for next/prev buttons
-        $(slick.options.container + ' ' + slick.options.next).click(function(e){
+        $(slick.options.theme.container + ' ' + slick.options.theme.next).click(function(e){
             e.preventDefault();
             slick.hooks.next.apply(slick);
         });
-        $(slick.options.container + ' ' + slick.options.prev).click(function(e){
+        $(slick.options.theme.container + ' ' + slick.options.theme.prev).click(function(e){
             e.preventDefault();
             slick.hooks.prev.apply(slick);
         });
-        $(slick.options.container + ' .total').html(slick.state.end - slick.state.start + 1);
+        $(slick.options.theme.container + ' ' + slick.options.theme.totalNo).html(slick.state.end - slick.state.start + 1);
 
         // Ataches keyboard control
         if(slick.options.keyControl){
@@ -193,7 +204,7 @@
             });
         }
         
-        $(slick.options.container + ' .skip').keypress(function(e){
+        $(slick.options.theme.container + ' .skip').keypress(function(e){
             if(e.keyCode === 13){
                 slick.hooks.skip.apply(slick, [$(this).val()]);
                 $(this).blur();
