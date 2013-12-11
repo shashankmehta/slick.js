@@ -94,6 +94,8 @@
                 $(slick.options.theme.container + ' .skip').val(slick.state.slide.current);
                 $(slick.options.theme.container + ' ' + slick.options.theme.currentNo).html(slick.state.slide.current);
             }
+
+            $(slick.options.theme.container + ' .length').width(100 * slick.state.slide.current / slick.state.slide.total + '%');
             
             if(slideStatus === 1){
                 $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();

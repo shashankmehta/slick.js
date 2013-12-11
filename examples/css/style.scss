@@ -9,6 +9,7 @@
 .slick{
 	width: 500px;
 	position: relative;
+	background: #0F0F0F;
 	font-family: Calibri, Candara, Arial, sans-serif;
 	box-shadow: 0px 0px 2px 2px #aaa;
 	
@@ -94,13 +95,18 @@
 					}
 				}
 			}
-
 		}
+	}
+
+	.length {
+		height: 1px;
+		width: 37%;
+		background: #7F8C8D;
 	}
 
 	.overlay-controls {
 		.overlay-next {
-			height: calc(100% - 30px);
+			height: calc(100% - 35px);
 			width: 50%;
 			display: block;
 			position: absolute;
@@ -108,7 +114,7 @@
 			right: 0;
 		}
 		.overlay-prev {
-			height: calc(100% - 30px);
+			height: calc(100% - 35px);
 			width: 50%;
 			display: block;
 			position: absolute;
@@ -125,11 +131,15 @@
 
 	.slick-content {
 		width: initial;
-		height: calc(100% - 30px);
+		height: calc(100% - 35px);
 
 		img {
 			width: initial;
 			height: 100%;
 		}
+	}
+
+	.length {
+		height: 2px;
 	}
 }
