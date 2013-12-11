@@ -1,6 +1,7 @@
 .slick{
 	width: 500px;
 	border: 1px solid #ccc;
+	position: relative;
 	
 	.slick-content{
 		width: inherit;
@@ -43,6 +44,25 @@
 			div {
 				float: right;
 			}
+		}
+	}
+
+	.overlay-controls {
+		.overlay-next {
+			height: calc(100% - 30px);
+			width: 50%;
+			display: block;
+			position: absolute;
+			top: 0;
+			right: 0;
+		}
+		.overlay-prev {
+			height: calc(100% - 30px);
+			width: 50%;
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
 		}
 	}
 }

@@ -11,6 +11,12 @@
 	<!-- This will containt the images -->
 	<div class="slick-content">
 	</div>
+	
+	<!-- Part of default theme. slick.js doesn't ask for it -->
+	<div class="overlay-controls">
+		<a href="#" class='overlay-prev'></a>
+		<a href="#" class='overlay-next'></a>
+	</div>
 
 	<!-- This contains the controls -->
 	<div class="slick-bottom">
@@ -37,6 +43,13 @@
 	};
 
 	slick = new Slick('.slick', config);
+
+	$('.overlay-next').click(function(){
+		Slick.next(slick);
+	})
+	$('.overlay-prev').click(function(){
+		Slick.prev(slick);
+	})
 	
 	$('.fullscreen').click(function () {
 		if (screenfull.enabled) {
