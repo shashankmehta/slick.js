@@ -23,14 +23,15 @@
 	}
 
 	.slick-bottom{
-		height: 25px;
-		padding-top: 5px;
+		height: 30px;
 		width: inherit;
 		color: #DDD;
 		background: #0F0F0F;
 		line-height: 21px;
 		
 		.slick-controls {
+			padding-top: 5px;
+
 			img {
 				width: 20px;
 				margin-left: 5px;
@@ -48,6 +49,7 @@
 			float: right;
 			padding-right: 10px;
 			position: relative;
+			padding-top: 5px;
 
 			.skip {
 				width: 16px;
@@ -60,7 +62,7 @@
 				color: #DDD;
 				position: absolute;
 				left: -20px;
-				top: 0px;
+				top: 5px;
 				@include transition(all, 0.2s, ease-in-out);
 
 				&:hover, &:active, &:focus {
