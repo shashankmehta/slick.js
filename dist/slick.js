@@ -1,6 +1,6 @@
 /*!
 * slick.js
-* v0.9.0 - 2013-12-11
+* v0.9.5 - 2013-12-12
 * https://github.com/shashankmehta/slick.js
 * (c) Shashank Mehta; MIT License
 */
@@ -93,6 +93,10 @@
             var slideStatus = slick.hooks.slideStatus.apply(slick, [step]);
             slick.state.slide.current = step - slick.state.slide.difference;
 
+            if(slick.state.slide.current === 1){
+                $(slick.options.theme.container).animate({'opacity': '1'}, 500);
+            }
+
             if($(slick.options.theme.container + ' .skip' + slick.options.theme.currentNo).is(':input')){
                 $(slick.options.theme.container + ' ' + slick.options.theme.currentNo).val(slick.state.slide.current);
             }
@@ -100,6 +104,8 @@
                 $(slick.options.theme.container + ' .skip').val(slick.state.slide.current);
                 $(slick.options.theme.container + ' ' + slick.options.theme.currentNo).html(slick.state.slide.current);
             }
+
+            $(slick.options.theme.container + ' .length').width(100 * slick.state.slide.current / slick.state.slide.total + '%');
             
             if(slideStatus === 1){
                 $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
@@ -182,6 +188,8 @@
     SlickProto.init = function(){
         var slick = this;
 
+        $(slick.options.theme.container).css('opacity', '0');
+
         // Sets the first slide
         if(typeof slick.options.source === 'string'){
             slick.hooks.next.apply(slick);
@@ -201,10 +209,10 @@
         // Ataches keyboard control
         if(slick.options.keyControl){
             $(document).keyup(function(e) {
-                if (e.keyCode ===  39 || e.keyCode ===  40) {
+                if ((e.keyCode ===  39 || e.keyCode ===  40) && !$('input:focus').exists()) {
                     slick.hooks.next.apply(slick);
                 }
-                if (e.keyCode ===  37 || e.keyCode ===  38) {
+                if ((e.keyCode ===  37 || e.keyCode ===  38) && !$('input:focus').exists()) {
                     slick.hooks.prev.apply(slick);
                 }
             });
