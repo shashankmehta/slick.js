@@ -62,7 +62,12 @@
 			if(!$('.slick.fullscreen').exists()){
 				// Needed because of a Chrome quirk. 
 				setTimeout(function(){
-					$('.slick').addClass('fullscreen');
+					if($(window).width() > $(window).height()){
+						$('.slick').addClass('fullscreen-width');
+					}
+					else{
+						$('.slick').addClass('fullscreen-height');
+					}
 					$('.slick .slick-bottom').width($('.slick-content img.current').width()).css('margin', 'auto');
 				}, 100);
 			}
@@ -72,7 +77,8 @@
 		// Undoing changes done through setTimeout above
 		if(!screenfull.isFullscreen){
 			$('.slick .slick-bottom').width('inherit').css('margin', 'auto');
-			$('.slick').removeClass('fullscreen');
+			$('.slick').removeClass('fullscreen-height');
+			$('.slick').removeClass('fullscreen-width');
 		};		
 	}
 </script>
