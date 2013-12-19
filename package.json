@@ -1,6 +1,6 @@
 {
   "name": "slick.js",
-  "version": "0.9.5",
+  "version": "1.0.0",
   "description": "Browser module - Embed presentations when you can't use SpeakerDeck or SlideShare.",
   "keywords": [
     "browser",

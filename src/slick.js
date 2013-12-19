@@ -203,10 +203,10 @@
         // Ataches keyboard control
         if(slick.options.keyControl){
             $(document).keyup(function(e) {
-                if ((e.keyCode ===  39 || e.keyCode ===  40) && !$('input:focus').exists()) {
+                if ((e.keyCode ===  39) && !$('input:focus').exists()) {
                     slick.hooks.next.apply(slick);
                 }
-                if ((e.keyCode ===  37 || e.keyCode ===  38) && !$('input:focus').exists()) {
+                if ((e.keyCode ===  37) && !$('input:focus').exists()) {
                     slick.hooks.prev.apply(slick);
                 }
             });
