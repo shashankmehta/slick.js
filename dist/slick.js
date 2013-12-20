@@ -1,6 +1,6 @@
 /*!
 * slick.js
-* v1.0.0 - 2013-12-19
+* v1.0.1 - 2013-12-20
 * https://github.com/shashankmehta/slick.js
 * (c) Shashank Mehta; MIT License
 */
@@ -105,12 +105,12 @@
                 $(slick.options.theme.container + ' ' + slick.options.theme.currentNo).html(slick.state.slide.current);
             }
 
-            $(slick.options.theme.container + ' .length').width(100 * slick.state.slide.current / slick.state.slide.total + '%');
             
             if(slideStatus === 1){
                 $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
                 $(slick.options.content + ' img[data-slide=' + step + ']').removeClass('cached-slide').addClass('current').show();
                 slick.state.current = step;
+                $(slick.options.theme.container + ' .length').width(100 * slick.state.slide.current / slick.state.slide.total + '%');
                 slick.hooks.getSlide.apply(slick, [step+1]);
                 return;
             }
@@ -143,6 +143,7 @@
                 $(slick.options.content + ' img.current').removeClass('current').addClass('cached-slide').hide();
                 $(this).removeClass('cached-slide').addClass('current').show();
                 slick.state.current = step;
+                $(slick.options.theme.container + ' .length').width(100 * (step + 1) / slick.state.slide.total + '%');
                 slick.hooks.getSlide.apply(slick, [step+1]);
             });
         },
