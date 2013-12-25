@@ -19,7 +19,9 @@ Fullscreen option is available in default theme. However it is not part of slick
 
 We followed the SpeakerDeck format. User uploads presentations in PDF format which is converted to images in the backend. The images are in serial order with a common suffix. Slick expects the image URL with a `*` in place of the number, the starting number and the ending one.
 
-To create the presentation, include jQuery and slick.js
+To create the presentation, include jQuery and slick.js.    
+Slick.js: [Development](https://github.com/shashankmehta/slick.js/blob/master/dist/slick.js) and [Production](https://github.com/shashankmehta/slick.js/blob/master/dist/slick.min.js)     
+Bower: `bower install --save slick`
 
 ```javascript
 var s = new Slick('.slick', options); // .slick is class/id of div to be used as container for Slick.
