@@ -164,6 +164,9 @@
 
         // Returns the path with the current no inserted
         imagePath: function(step){
+            if (typeof(this.options.source) == 'object' && this.options.source !== null) {
+                return this.options.source[step];
+            }
             var parts = this.options.source.split('*');
             return parts[0] + step + parts[1];
         },
@@ -188,6 +191,9 @@
         // Sets the first slide
         if(typeof slick.options.source === 'string'){
             slick.hooks.next.apply(slick);
+        }
+        else if (typeof(slick.options.source) == 'object' && slick.options.source !== null) {
+            slick.hooks.setSlide.apply(slick, [0]);
         }
 
         // Attaches event listeners for next/prev buttons
