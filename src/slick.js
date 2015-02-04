@@ -191,6 +191,9 @@
         $(slick.options.theme.container).css('opacity', '0');
 
         var getParameterByName = function (name) {
+            if(typeof name === "undefined"){
+              return 0;
+            }
             name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
             var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
                 results = regex.exec(location.search);
